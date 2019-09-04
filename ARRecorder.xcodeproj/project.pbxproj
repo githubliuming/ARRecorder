@@ -18,6 +18,7 @@
 		54E62378231F4E1F0096916B /* QYARRender.m in Sources */ = {isa = PBXBuildFile; fileRef = 54E62377231F4E1F0096916B /* QYARRender.m */; };
 		54E6237C231F53E50096916B /* UIScreen+QYCategory.m in Sources */ = {isa = PBXBuildFile; fileRef = 54E6237B231F53E50096916B /* UIScreen+QYCategory.m */; };
 		54E6237F231F5BD90096916B /* UIImage+QYCategory.m in Sources */ = {isa = PBXBuildFile; fileRef = 54E6237E231F5BD90096916B /* UIImage+QYCategory.m */; };
+		54E62383231F69820096916B /* WriteAR.m in Sources */ = {isa = PBXBuildFile; fileRef = 54E62382231F69820096916B /* WriteAR.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -41,6 +42,9 @@
 		54E6237B231F53E50096916B /* UIScreen+QYCategory.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "UIScreen+QYCategory.m"; sourceTree = "<group>"; };
 		54E6237D231F5BD90096916B /* UIImage+QYCategory.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "UIImage+QYCategory.h"; sourceTree = "<group>"; };
 		54E6237E231F5BD90096916B /* UIImage+QYCategory.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "UIImage+QYCategory.m"; sourceTree = "<group>"; };
+		54E62381231F69820096916B /* WriteAR.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WriteAR.h; sourceTree = "<group>"; };
+		54E62382231F69820096916B /* WriteAR.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = WriteAR.m; sourceTree = "<group>"; };
+		54E62384231F6C100096916B /* QYRecordConstant.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = QYRecordConstant.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -92,10 +96,12 @@
 		5450F215231E62410054B18B /* QYRecordCore */ = {
 			isa = PBXGroup;
 			children = (
+				54E62380231F69700096916B /* Writer */,
 				54E62379231F53CB0096916B /* Extensions */,
 				54E62375231F4E090096916B /* Rendering */,
 				5450F216231E62650054B18B /* QYReocrder.h */,
 				5450F217231E62650054B18B /* QYReocrder.m */,
+				54E62384231F6C100096916B /* QYRecordConstant.h */,
 			);
 			path = QYRecordCore;
 			sourceTree = "<group>";
@@ -118,6 +124,15 @@
 				54E6237E231F5BD90096916B /* UIImage+QYCategory.m */,
 			);
 			path = Extensions;
+			sourceTree = "<group>";
+		};
+		54E62380231F69700096916B /* Writer */ = {
+			isa = PBXGroup;
+			children = (
+				54E62381231F69820096916B /* WriteAR.h */,
+				54E62382231F69820096916B /* WriteAR.m */,
+			);
+			path = Writer;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -192,6 +207,7 @@
 			files = (
 				54E6237C231F53E50096916B /* UIScreen+QYCategory.m in Sources */,
 				5450F218231E62650054B18B /* QYReocrder.m in Sources */,
+				54E62383231F69820096916B /* WriteAR.m in Sources */,
 				5450F204231E612C0054B18B /* ViewController.m in Sources */,
 				54E6237F231F5BD90096916B /* UIImage+QYCategory.m in Sources */,
 				5450F1FE231E612C0054B18B /* AppDelegate.m in Sources */,

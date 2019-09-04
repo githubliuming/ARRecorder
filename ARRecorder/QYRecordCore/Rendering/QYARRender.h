@@ -8,12 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import <ARKit/ARKit.h>
-typedef NS_ENUM(NSInteger,ARFrameMode)
-{
-    autoAdjust,
-    aspectFit,
-    aspectFill,
-}
+#import "QYRecordConstant.h"
 API_AVAILABLE(ios(11.0));
 NS_ASSUME_NONNULL_BEGIN
 
