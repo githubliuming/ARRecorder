@@ -16,8 +16,8 @@
 - (void)didFailRecording:(NSError *)error status:(NSString *)status;
 
 - (void)didCancelReocording:(NSString *)status;
-//TODO:LM 确定类型
-- (void)didUpdateRecording:(float)duration;
+
+- (void)didUpdateRecording:(NSTimeInterval)duration;
 
 - (void)willEnterBackground:(ARRecordStatus)status;
 @end

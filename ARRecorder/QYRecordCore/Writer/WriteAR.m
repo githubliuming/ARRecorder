@@ -58,15 +58,15 @@
                
                 if(granted)
                 {
-                    //TODO:LM prepareAudioDevice
+                    [self prepareAudioDevice:queue];
                 }
             }];
         }
         self.videoOutputSettings = @{AVVideoCodecKey:AVVideoCodecTypeH264,AVVideoWidthKey:@(size.width),AVVideoHeightKey:@(size.height)};
-        NSDictionary * attributes = @{
-                                      (__bridge NSString *)kCVPixelBufferCGImageCompatibilityKey :@(YES),
-                                      (__bridge NSString *)kCVPixelBufferCGBitmapContextCompatibilityKey:@(YES)
-                                      };
+//        NSDictionary * attributes = @{
+//                                      (__bridge NSString *)kCVPixelBufferCGImageCompatibilityKey :@(YES),
+//                                      (__bridge NSString *)kCVPixelBufferCGBitmapContextCompatibilityKey:@(YES)
+//                                      };
         self.videoInput = [AVAssetWriterInput assetWriterInputWithMediaType:AVMediaTypeVideo
                                                              outputSettings:self.videoOutputSettings];
         self.videoInput.expectsMediaDataInRealTime = YES;
@@ -132,7 +132,10 @@
         {
             [self.asserWriter addInput:self.videoInput];
         } else {
-            //TODO:LM 添加代理
+            if(self.delegate && [self.delegate respondsToSelector:@selector(didFailRecording:status:)])
+            {
+                [self.delegate didFailRecording:self.asserWriter.error status:@"[self.asserWriter canAddInput:self.videoInput] error"];
+            }
             self.isWritingWithoutError = YES;
         }
         self.asserWriter.shouldOptimizeForNetworkUse = adjustForSharing;
@@ -198,7 +201,10 @@
         }
         else
         {
-            //TODO:LM 添加代理回调
+            if(self.delegate && [self.delegate respondsToSelector:@selector(didFailRecording:status:)])
+            {
+                [self.delegate didFailRecording:self.asserWriter.error status:@"[self.asserWriter startWriting] error"];
+            }
             self.currentDuration = 0;
             self.isRecording = NO;
             self.isWritingWithoutError = NO;
@@ -206,7 +212,11 @@
     }
     else if (self.asserWriter.status == AVPlayerLooperStatusFailed)
     {
-        //TODO:LM 添加代理回调
+        if(self.delegate && [self.delegate respondsToSelector:@selector(didFailRecording:status:)])
+        {
+            [self.delegate didFailRecording:self.asserWriter.error status:@"Video session failed while recording."];
+        }
+        NSLog(@"self.asserWriter.status == AVPlayerLooperStatusFailed !! error = %@",self.asserWriter.error);
         self.currentDuration = 0;
         self.isRecording = NO;
         self.isWritingWithoutError = NO;
@@ -218,7 +228,10 @@
         self.currentDuration = CMTimeGetSeconds(time) - CMTimeGetSeconds(self.startingVideoTime);
         self.isRecording = YES;
         self.isWritingWithoutError = YES;
-         //TODO:LM 添加代理回调
+        if(self.delegate && [self.delegate respondsToSelector:@selector(didUpdateRecording:)])
+        {
+            [self.delegate didUpdateRecording:self.currentDuration];
+        }
     }
 }
 - (void)append:(CVPixelBufferRef)buffer time:(CMTime)time{

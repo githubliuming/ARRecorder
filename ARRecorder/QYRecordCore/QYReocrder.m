@@ -217,7 +217,14 @@
                 self.isRecording = YES;
                 self.status = recording;
                 
-                //TODO:LM FinishCallback
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [self stop:^(NSURL *vidoePath) {
+                       if(finished)
+                       {
+                           finished(vidoePath);
+                       }
+                    }];
+                });
             }];
         }
         else
@@ -225,7 +232,12 @@
             self.recordingWithLimit = true;
             self.isRecording = true;
             self.status = recording;
-            //TODO:LM FinishCallback
+            [self stop:^(NSURL *vidoePath) {
+                if(finished)
+                {
+                    finished(vidoePath);
+                }
+            }];
         }
     });
 }
