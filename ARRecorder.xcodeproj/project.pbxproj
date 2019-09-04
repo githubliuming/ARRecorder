@@ -19,6 +19,7 @@
 		54E6237C231F53E50096916B /* UIScreen+QYCategory.m in Sources */ = {isa = PBXBuildFile; fileRef = 54E6237B231F53E50096916B /* UIScreen+QYCategory.m */; };
 		54E6237F231F5BD90096916B /* UIImage+QYCategory.m in Sources */ = {isa = PBXBuildFile; fileRef = 54E6237E231F5BD90096916B /* UIImage+QYCategory.m */; };
 		54E62383231F69820096916B /* WriteAR.m in Sources */ = {isa = PBXBuildFile; fileRef = 54E62382231F69820096916B /* WriteAR.m */; };
+		54E6238B231FBDF60096916B /* ARView.m in Sources */ = {isa = PBXBuildFile; fileRef = 54E6238A231FBDF60096916B /* ARView.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -45,6 +46,10 @@
 		54E62381231F69820096916B /* WriteAR.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WriteAR.h; sourceTree = "<group>"; };
 		54E62382231F69820096916B /* WriteAR.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = WriteAR.m; sourceTree = "<group>"; };
 		54E62384231F6C100096916B /* QYRecordConstant.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = QYRecordConstant.h; sourceTree = "<group>"; };
+		54E62386231F8FD10096916B /* RecordARDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RecordARDelegate.h; sourceTree = "<group>"; };
+		54E62387231F8FED0096916B /* RenderARDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RenderARDelegate.h; sourceTree = "<group>"; };
+		54E62389231FBDF60096916B /* ARView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ARView.h; sourceTree = "<group>"; };
+		54E6238A231FBDF60096916B /* ARView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ARView.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -96,6 +101,8 @@
 		5450F215231E62410054B18B /* QYRecordCore */ = {
 			isa = PBXGroup;
 			children = (
+				54E62388231FBDE60096916B /* base */,
+				54E62385231F8FA20096916B /* protocols */,
 				54E62380231F69700096916B /* Writer */,
 				54E62379231F53CB0096916B /* Extensions */,
 				54E62375231F4E090096916B /* Rendering */,
@@ -133,6 +140,24 @@
 				54E62382231F69820096916B /* WriteAR.m */,
 			);
 			path = Writer;
+			sourceTree = "<group>";
+		};
+		54E62385231F8FA20096916B /* protocols */ = {
+			isa = PBXGroup;
+			children = (
+				54E62386231F8FD10096916B /* RecordARDelegate.h */,
+				54E62387231F8FED0096916B /* RenderARDelegate.h */,
+			);
+			path = protocols;
+			sourceTree = "<group>";
+		};
+		54E62388231FBDE60096916B /* base */ = {
+			isa = PBXGroup;
+			children = (
+				54E62389231FBDF60096916B /* ARView.h */,
+				54E6238A231FBDF60096916B /* ARView.m */,
+			);
+			path = base;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -214,6 +239,7 @@
 				5450F20F231E612E0054B18B /* main.m in Sources */,
 				54E62378231F4E1F0096916B /* QYARRender.m in Sources */,
 				5450F201231E612C0054B18B /* SceneDelegate.m in Sources */,
+				54E6238B231FBDF60096916B /* ARView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

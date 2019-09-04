@@ -15,7 +15,6 @@
 }
 @property(nonatomic,assign)id view;
 @property(nonatomic,strong)SCNRenderer * renderEngine;
-@property(nonatomic,assign)ARFrameMode content;
 @end
 @implementation QYARRender
 

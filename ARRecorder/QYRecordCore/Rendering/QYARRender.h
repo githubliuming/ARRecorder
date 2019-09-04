@@ -9,9 +9,9 @@
 #import <Foundation/Foundation.h>
 #import <ARKit/ARKit.h>
 #import "QYRecordConstant.h"
-API_AVAILABLE(ios(11.0));
-NS_ASSUME_NONNULL_BEGIN
 
+NS_ASSUME_NONNULL_BEGIN
+API_AVAILABLE(ios(11.0))
 @interface QYARRender : NSObject
 - (instancetype)initWithARView:(id)view renderer:(SCNRenderer *)renderEngine contentMode:(ARFrameMode)mode;
 
@@ -20,6 +20,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property(nonatomic,assign,readonly)CVPixelBufferRef rawBuffer;
 @property(nonatomic,assign,readonly)CGSize bufferSize;
 @property(nonatomic,assign,readonly,nullable)CVPixelBufferRef buffer;
+@property(nonatomic,assign)ARFrameMode content;
 @end
 
 NS_ASSUME_NONNULL_END
