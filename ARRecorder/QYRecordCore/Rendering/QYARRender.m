@@ -42,11 +42,21 @@
     return CACurrentMediaTime();
 }
 - (CVPixelBufferRef)rawBuffer{
-    if(self.view && [self.view isKindOfClass:[ARSCNView class]])
+    if(self.view)
     {
-        ARSCNView * scnView = (ARSCNView *)self.view;
-        CVPixelBufferRef rawBuffer = [scnView.session.currentFrame capturedImage];
-        return rawBuffer;
+        if([self.view isKindOfClass:[ARSCNView class]])
+        {
+            ARSCNView * scnView = (ARSCNView *)self.view;
+            CVPixelBufferRef rawBuffer = [scnView.session.currentFrame capturedImage];
+            return rawBuffer;
+        } else if ([self.view isKindOfClass:[ARSKView class]])
+        {
+            ARSKView * skView = (ARSKView *)self.view;
+            CVPixelBufferRef rawBuffer = [skView.session.currentFrame capturedImage];
+            return rawBuffer;
+        } else if ([self.view isKindOfClass:[SCNView class]]) {
+            return self.buffer;
+        }
     }
     return NULL;
 }
