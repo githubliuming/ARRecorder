@@ -47,13 +47,12 @@
         {
             ARSCNView * scnView = (ARSCNView *)self.view;
             CVPixelBufferRef rawBuffer = [scnView.session.currentFrame capturedImage];
-            CVPixelBufferRetain(rawBuffer);
+
             return rawBuffer;
         } else if ([self.view isKindOfClass:[ARSKView class]])
         {
             ARSKView * skView = (ARSKView *)self.view;
             CVPixelBufferRef rawBuffer = [skView.session.currentFrame capturedImage];
-            CVPixelBufferRetain(rawBuffer);
             return rawBuffer;
         } else if ([self.view isKindOfClass:[SCNView class]]) {
             return self.buffer;

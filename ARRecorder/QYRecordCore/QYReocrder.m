@@ -44,7 +44,6 @@
 }
 - (void)renderFrame
 {
-    
     if(self.onlyRenderWhileRec && !self.isRecording)
     {
         return;
@@ -67,7 +66,7 @@
     {
         [WriteAR message:@"bufferSize is zero"];
         CVPixelBufferRelease(buffer);
-        CVPixelBufferRelease(rawBuffer);
+//        CVPixelBufferRelease(rawBuffer);
         return;
     }
     
@@ -87,7 +86,7 @@
                 CMTime finalFrameTime;
                 if(self.backFromPause)
                 {
-                    if(CMTimeCompare(self.resumeFrameTime, kCMTimeZero))
+                    if(CMTimeCompare(self.resumeFrameTime, kCMTimeZero) == 0)
                     {
                         self.resumeFrameTime = time;
                     }
@@ -99,6 +98,7 @@
                 {
                     finalFrameTime = time;
                 }
+                NSLog(@"当前时间 = %f resumeFrameTime = %f pausedFrameTime = %f",CMTimeGetSeconds(finalFrameTime),CMTimeGetSeconds(self.resumeFrameTime),CMTimeGetSeconds(self.resumeFrameTime));
                 [self.wirtter insert:buffer time:finalFrameTime];
             
                 if(!self.wirtter.isWritingWithoutError)
@@ -132,9 +132,11 @@
         {
             [self.wirtter pause];
             self.adjustPausedTime = NO;
-            if(!CMTimeCompare(self.pausedFrameTime, kCMTimeZero) && !CMTimeCompare(self.resumeFrameTime, kCMTimeZero))
+            if(CMTimeCompare(self.pausedFrameTime, kCMTimeZero) != 0 && CMTimeCompare(self.resumeFrameTime, kCMTimeZero) != 0)
             {
                 self.pausedFrameTime = [self adjustTime:time resumeTime:self.resumeFrameTime pauseTime:self.pausedFrameTime];
+                
+                NSLog(@"pause resumeFrameTime = %f pausedFrameTime = %f",CMTimeGetSeconds(self.resumeFrameTime),CMTimeGetSeconds(self.resumeFrameTime));
             }
             else
             {
@@ -147,7 +149,7 @@
         }
 
         CVPixelBufferRelease(buffer);
-        CVPixelBufferRelease(rawBuffer);
+//        CVPixelBufferRelease(rawBuffer);
     });
     
 }
@@ -171,6 +173,8 @@
     self.backFromPause = NO;
     self.recordingWithLimit = NO;
     self.onlyRenderWhileRec = YES;
+    self.resumeFrameTime = kCMTimeZero;
+    self.pausedFrameTime = kCMTimeZero;
    
     
     
@@ -325,6 +329,7 @@
                     [self.delegate didCancelReocording:@"异常取消录制视频"];
                 }
             }
+            self.wirtter = nil;
         });
         
     });

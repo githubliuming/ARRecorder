@@ -62,6 +62,8 @@ API_AVAILABLE(ios(11.0))
 - (void)pause;
 
 - (void)stop:(void(^)(NSURL * vidoePath))finished;
+
+- (void)cancel;
 @end
 
 NS_ASSUME_NONNULL_END
