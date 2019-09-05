@@ -67,6 +67,7 @@
     {
         [WriteAR message:@"bufferSize is zero"];
         CVPixelBufferRelease(buffer);
+        CVPixelBufferRelease(rawBuffer);
         return;
     }
     
@@ -146,6 +147,7 @@
         }
 
         CVPixelBufferRelease(buffer);
+        CVPixelBufferRelease(rawBuffer);
     });
     
 }
