@@ -31,13 +31,16 @@
 
 - (CVPixelBufferRef)buffer
 {
-    NSDictionary * attrs = @{(__bridge NSString *)kCVPixelBufferCGImageCompatibilityKey:@(YES),(__bridge NSString *)kCVPixelBufferCGBitmapContextCompatibilityKey:@(YES)};
+    NSDictionary * attrs = [NSDictionary dictionaryWithObjectsAndKeys:
+                            [NSNumber numberWithBool:YES], kCVPixelBufferCGImageCompatibilityKey,
+                            [NSNumber numberWithBool:YES], kCVPixelBufferCGBitmapContextCompatibilityKey,
+                            nil];
 
     CVPixelBufferRef pixelBuffer;
-    CVReturn status = CVPixelBufferCreate(kCFAllocatorDefault, self.size.width, self.size.height, kCVPixelFormatType_32ARGB,(__bridge CFDictionaryRef)attrs, &pixelBuffer);
+    CVReturn status = CVPixelBufferCreate(kCFAllocatorDefault, self.size.width, self.size.height, kCVPixelFormatType_32BGRA,(__bridge CFDictionaryRef)attrs, &pixelBuffer);
     if(status == kCVReturnSuccess)
     {
-        CVPixelBufferLockBaseAddress(pixelBuffer, kCVPixelBufferLock_ReadOnly);
+        CVPixelBufferLockBaseAddress(pixelBuffer,kCVPixelBufferLock_ReadOnly);
         void * pixelData = CVPixelBufferGetBaseAddress(pixelBuffer);
        CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
        CGContextRef context = CGBitmapContextCreate(pixelData, self.size.width, self.size.height, 8, CVPixelBufferGetBytesPerRow(pixelBuffer), colorSpace, kCGBitmapByteOrder32Little | kCGImageAlphaPremultipliedFirst);

@@ -19,6 +19,8 @@ API_AVAILABLE(ios(11.0))
 
 - (instancetype)initWithARSKView:(ARSCNView *)arView;
 
+@property(nonatomic,strong)ARSCNView * weakScnView;
+
 @property(nonatomic,weak)id<RecordARDelegate> delegate;
 @property(nonatomic,weak)id<RenderARDelegate> renderARDelegate;
 
@@ -53,6 +55,13 @@ API_AVAILABLE(ios(11.0))
 @property(nonatomic,strong)NSURL * videoPath;
 @property(nonatomic,strong,nullable)WriteAR * wirtter;
 
+- (void)startRecord;
+
+- (void)startRecord:(NSTimeInterval)time finished:(void(^)(NSURL * vidoePath))finished;
+
+- (void)pause;
+
+- (void)stop:(void(^)(NSURL * vidoePath))finished;
 @end
 
 NS_ASSUME_NONNULL_END

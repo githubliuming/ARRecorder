@@ -9,7 +9,6 @@
 #import "QYReocrder.h"
 #import "Rendering/QYARRender.h"
 @interface QYReocrder()
-@property(nonatomic,weak)ARSCNView * weakScnView;
 @property(nonatomic,strong)CADisplayLink * displayLink;
 @property(nonatomic,strong)SCNRenderer * renderEngine;
 @property(nonatomic,strong)QYARRender * render;
@@ -32,6 +31,7 @@
     id<MTLDevice> device = MTLCreateSystemDefaultDevice();
     NSAssert(device, @"该设备不支持 Metal");
     self.renderEngine = [SCNRenderer rendererWithDevice:device options:nil];
+    self.renderEngine.scene = self.weakScnView.scene;
     self.displayLink = [CADisplayLink displayLinkWithTarget:self selector:@selector(renderFrame)];
     self.displayLink.preferredFramesPerSecond = self.fps;
     [self.displayLink addToRunLoop:[NSRunLoop mainRunLoop] forMode:NSRunLoopCommonModes];
@@ -44,7 +44,11 @@
 }
 - (void)renderFrame
 {
-    if(self.onlyRenderWhileRec && !self.isRecording){return;}
+    
+    if(self.onlyRenderWhileRec && !self.isRecording)
+    {
+        return;
+    }
     CVPixelBufferRef buffer = self.render.buffer;
     if(buffer == nil)
     {
@@ -55,12 +59,14 @@
     if(rawBuffer == nil)
     {
         [WriteAR message:@"rawBuffer is nil"];
+        CVPixelBufferRelease(buffer);
         return;
     }
     CGSize size = self.render.bufferSize;
     if(CGSizeEqualToSize(size, CGSizeZero))
     {
         [WriteAR message:@"bufferSize is zero"];
+        CVPixelBufferRelease(buffer);
         return;
     }
     
@@ -72,7 +78,7 @@
         {
             [self.renderARDelegate frameDidRender:buffer time:time rawBuffer:rawBuffer];
         }
-        
+        NSLog(@"当前 录制状态");
         if(self.isRecording)
         {
             if(self.wirtter)
@@ -87,11 +93,13 @@
                     //计算规则 (currentTime - (timeWhenResume - timeWhenPaused))
                     finalFrameTime = [self adjustTime:time resumeTime:self.resumeFrameTime pauseTime:self.pausedFrameTime];
                     
-                } else
+                }
+                else
                 {
                     finalFrameTime = time;
                 }
                 [self.wirtter insert:buffer time:finalFrameTime];
+            
                 if(!self.wirtter.isWritingWithoutError)
                 {
                     self.isRecording = NO;
@@ -135,8 +143,9 @@
             self.resumeFrameTime = kCMTimeZero;
             self.status = paused;
             self.onlyRenderWhileRec = self.onlyRenderWhileRecording;
-            
         }
+
+        CVPixelBufferRelease(buffer);
     });
     
 }
@@ -144,7 +153,7 @@
 {
     self.status = unkown;
     self.micStatus = unknown;
-    self.requestMicPermission = manual;
+    self.enableAudio = YES;
     self.fps = autofps;
     self.videoOrientation = autoOrientation;
     self.contentMode = autoAdjust;
@@ -160,6 +169,7 @@
     self.backFromPause = NO;
     self.recordingWithLimit = NO;
     self.onlyRenderWhileRec = YES;
+   
     
     
 }
@@ -268,6 +278,7 @@
         dispatch_async(dispatch_get_main_queue(), ^{
            
             [self.wirtter end:^{
+                NSLog(@"视频录制结束");
                 if(self.currentVideoPath){
                     if(finished){
                         finished(self.currentVideoPath);
@@ -357,7 +368,7 @@
     formatter.timeStyle = NSDateIntervalFormatterFullStyle;
     formatter.dateFormat = @"yyyy-MM-dd'@'HH-mm-ssZZZZ";
     NSDate *date = [NSDate date];
-    path = [NSString stringWithFormat:@"%@\%@ARVideo.mp4",path,[formatter stringFromDate:date]];
+    path = [NSString stringWithFormat:@"%@/%@ARVideo.mp4",path,[formatter stringFromDate:date]];
     _videoPath = [NSURL fileURLWithPath:path];
     return _videoPath;
 }

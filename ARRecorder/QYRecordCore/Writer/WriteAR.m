@@ -38,7 +38,7 @@
         NSAssert(output, @"faluire output is nil");
         NSError * error;
         self.asserWriter = [AVAssetWriter assetWriterWithURL:output fileType:AVFileTypeMPEG4 error:&error];
-        NSAssert(error,@"faluire init AVAssetWriter");
+        NSAssert(!error,@"faluire init AVAssetWriter");
         self.audioBufferQueue = dispatch_queue_create("com.qyARRecord.audioBufferQueue",DISPATCH_QUEUE_SERIAL);
         self.videoInputOrientation = autoOrientation;
         if(audioEnabled)
@@ -49,13 +49,14 @@
                             mode:AVAudioSessionModeSpokenAudio
                          options:AVAudioSessionCategoryOptionMixWithOthers|AVAudioSessionCategoryOptionAllowBluetooth|AVAudioSessionCategoryOptionDefaultToSpeaker|AVAudioSessionCategoryOptionInterruptSpokenAudioAndMixWithOthers
                            error:&error];
-            NSAssert(error,@"faluire setup AVAudioSession");
+            NSAssert(!error,@"faluire setup AVAudioSession");
             error = nil;
             [session setActive:YES error:&error];
-            NSAssert(error,@"faluire Active AVAudioSession");
+            NSAssert(!error,@"faluire Active AVAudioSession");
             
             [session requestRecordPermission:^(BOOL granted) {
                
+                NSLog(@"麦克风权限 = %d",granted);
                 if(granted)
                 {
                     [self prepareAudioDevice:queue];
@@ -150,6 +151,7 @@
     AVCaptureDeviceInput *  audioDeviceInput = [AVCaptureDeviceInput deviceInputWithDevice:device error:&error];
     if(!error)
     {
+        
        AVCaptureAudioDataOutput * audioDataOutput = [[AVCaptureAudioDataOutput alloc] init];
         [audioDataOutput setSampleBufferDelegate:self queue:queue];
         self.session = [[AVCaptureSession alloc] init];
@@ -174,6 +176,7 @@
         {
             [self.asserWriter addInput:self.audioInput];
         }
+        NSLog(@"音频录制准备完成");
     }
     
 }
@@ -184,13 +187,9 @@
 }
 - (void)insert:(CVPixelBufferRef)buffer time:(CMTime)time
 {
+    CVPixelBufferRetain(buffer);
     if(self.asserWriter.status == AVPlayerLooperStatusUnknown)
     {
-        if(CMTIME_IS_INVALID(self.startingVideoTime))
-        {
-            self.isWritingWithoutError = false;
-            return;
-        }
         self.startingVideoTime = time;
         if([self.asserWriter startWriting])
         {
@@ -233,6 +232,7 @@
             [self.delegate didUpdateRecording:self.currentDuration];
         }
     }
+    CVPixelBufferRelease(buffer);
 }
 - (void)append:(CVPixelBufferRef)buffer time:(CMTime)time{
     [self.pixelBufferInput appendPixelBuffer:buffer withPresentationTime:time];
@@ -251,7 +251,13 @@
     if(self.asserWriter.status == AVAssetWriterStatusWriting)
     {
         [self.asserWriter finishWritingWithCompletionHandler:finishedHandler];
+        NSLog(@"视频写入完成");
     }
+    else
+    {
+        NSLog(@"视频写入未完成");
+    }
+    
     
 }
 - (void)cancel
@@ -268,10 +274,13 @@
 {
     if(self.audioInput)
     {
+        CFRetain(sampleBuffer);
         dispatch_async(self.audioBufferQueue, ^{
             if([self.audioInput isReadyForMoreMediaData] && self.isRecording){
+                NSLog(@"追加一个音频数据");
                 [self.audioInput appendSampleBuffer:sampleBuffer];
             }
+            CFRelease(sampleBuffer);
         });
     }
 }
