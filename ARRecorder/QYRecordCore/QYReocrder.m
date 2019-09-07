@@ -141,7 +141,8 @@
                                                   audioEnabled:self.enableAudio
                                                    orientaions:@[]
                                                          queue:self.writerQueue
-                                                      allowMix:self.enableMixWithOthers];
+                                                      allowMix:self.enableMixWithOthers
+                                                           fps:self.fps];
                 self.wirtter.videoInputOrientation = self.videoOrientation;
                 self.wirtter.delegate = self.delegate;
             }
@@ -238,26 +239,26 @@
         }
     });
 }
-- (void)startRecord:(NSTimeInterval)time finished:(void(^)(NSURL * vidoePath))finished
+- (void)startRecord:(NSTimeInterval)time finished:(void(^)(NSURL * videoPath))finished
 {
     dispatch_sync(self.writerQueue, ^{
        
-        if(self.enableAudio && self.micStatus == unknown)
+        if(self.enableAudio && self.micStatus != disabled)
         {
             [self requestMicrophonePerMission:^(BOOL status) {
                 if(!status)
                 {
                     NSLog(@"拒绝了 麦克风权限");
                 }
+                self.recordingWithLimit = YES;
                 self.isRecording = YES;
                 self.status = recording;
-                
-                dispatch_async(dispatch_get_main_queue(), ^{
+                dispatch_after(dispatch_time(DISPATCH_TIME_NOW,10 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
                     [self stop:^(NSURL *vidoePath) {
-                       if(finished)
-                       {
-                           finished(vidoePath);
-                       }
+                        if(finished)
+                        {
+                            finished(vidoePath);
+                        }
                     }];
                 });
             }];
@@ -267,12 +268,14 @@
             self.recordingWithLimit = true;
             self.isRecording = true;
             self.status = recording;
-            [self stop:^(NSURL *vidoePath) {
-                if(finished)
-                {
-                    finished(vidoePath);
-                }
-            }];
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [self stop:^(NSURL *vidoePath) {
+                    if(finished)
+                    {
+                        finished(vidoePath);
+                    }
+                }];
+            });
         }
     });
 }

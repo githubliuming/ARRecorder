@@ -36,7 +36,8 @@ NS_ASSUME_NONNULL_BEGIN
                   audioEnabled:(BOOL)audioEnabled
                    orientaions:(NSArray *)orientaions
                          queue:(dispatch_queue_t)queue
-                      allowMix:(BOOL)allowMix;
+                      allowMix:(BOOL)allowMix
+                           fps:(NSInteger)fps;
 @end
 
 NS_ASSUME_NONNULL_END

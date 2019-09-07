@@ -50,7 +50,7 @@ API_AVAILABLE(ios(11.0))
 /// 开始录制指定时长的视频
 /// @param time 录制时长
 /// @param finished 录制完成回调
-- (void)startRecord:(NSTimeInterval)time finished:(void(^)(NSURL * vidoePath))finished;
+- (void)startRecord:(NSTimeInterval)time finished:(void(^)(NSURL * videoPath))finished;
 /// 暂停录制
 - (void)pause;
 

@@ -21,6 +21,8 @@
 
 @property(nonatomic,strong)dispatch_queue_t audioBufferQueue;
 @property(nonatomic,assign)BOOL isRecording;
+@property(nonatomic,assign)CGSize size;
+@property(nonatomic,assign)NSInteger fps;
 
 @end
 @implementation WriteAR
@@ -32,6 +34,7 @@
                    orientaions:(NSArray *)orientaions
                          queue:(dispatch_queue_t)queue
                       allowMix:(BOOL)allowMix
+                           fps:(NSInteger)fps
 {
     self = [super init];
     if (self) {
@@ -63,7 +66,8 @@
                 }
             }];
         }
-        self.videoOutputSettings = @{AVVideoCodecKey:AVVideoCodecTypeH264,AVVideoWidthKey:@(size.width),AVVideoHeightKey:@(size.height)};
+        self.size = size;
+        self.fps = fps;
 //        NSDictionary * attributes = @{
 //                                      (__bridge NSString *)kCVPixelBufferCGImageCompatibilityKey :@(YES),
 //                                      (__bridge NSString *)kCVPixelBufferCGBitmapContextCompatibilityKey:@(YES)
@@ -166,7 +170,7 @@
         {
             [self.session addOutput:audioDataOutput];
         }
-        self.audioSettings = [audioDataOutput recommendedAudioSettingsForAssetWriterWithOutputFileType:AVFileTypeAppleM4V];
+//        self.audioSettings = [audioDataOutput recommendedAudioSettingsForAssetWriterWithOutputFileType:AVFileTypeAppleM4V];
         self.audioInput = [AVAssetWriterInput assetWriterInputWithMediaType:AVMediaTypeAudio outputSettings:self.audioSettings];
         self.audioInput.expectsMediaDataInRealTime = YES;
         dispatch_async(self.audioBufferQueue, ^{
@@ -285,6 +289,49 @@
     }
 }
 
+- (NSDictionary<NSString *,id> *)videoOutputSettings
+{
+    if(_videoOutputSettings == nil)
+    {
+        NSDictionary * comporessionPropeties = @{
+                                                 AVVideoAverageBitRateKey:[NSNumber numberWithInt:self.size.width * self.size.height * 3.0f],
+                                                 AVVideoExpectedSourceFrameRateKey:@(self.fps),
+                                                 AVVideoProfileLevelKey:AVVideoProfileLevelH264HighAutoLevel,
+                                                 AVVideoMaxKeyFrameIntervalKey:@(20)
+                                                 };
+        _videoOutputSettings = @{
+                                 AVVideoCodecKey:AVVideoCodecTypeH264,
+                                 AVVideoWidthKey:@(self.size.width),
+                                 AVVideoHeightKey:@(self.size.height),
+                                 AVVideoCompressionPropertiesKey:comporessionPropeties,
+                                 AVVideoScalingModeKey:AVVideoScalingModeResizeAspectFill
+                                 };
+    }
+    return _videoOutputSettings;
+}
+
+- (NSDictionary<NSString *,id> *) audioSettings
+{
+    if(_audioSettings == nil)
+    {
+        AudioChannelLayout setereChannelLayout = {
+            .mChannelLayoutTag = kAudioChannelLayoutTag_Mono,
+            .mChannelBitmap = 0,
+            .mNumberChannelDescriptions = 0,
+        };
+        
+        NSData * channelLayoutAsData = [NSData dataWithBytes:&setereChannelLayout length:offsetof(AudioChannelLayout,mChannelDescriptions)];
+        _audioSettings = @{
+                           AVFormatIDKey:@(kAudioFormatMPEG4AAC),
+                           AVEncoderBitRateKey:@(96000),
+                           AVSampleRateKey:@(44100),
+                           AVChannelLayoutKey:channelLayoutAsData,
+                           AVNumberOfChannelsKey:@(1)
+                           };
+        
+    }
+    return _audioSettings;
+}
 #pragma mark - 类方法
 + (void) message:(NSString *)message
 {
