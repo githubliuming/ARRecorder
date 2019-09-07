@@ -276,7 +276,7 @@
     {
         CFRetain(sampleBuffer);
         dispatch_async(self.audioBufferQueue, ^{
-            if([self.audioInput isReadyForMoreMediaData] && self.isRecording){
+            if(self.isRecording && [self.audioInput isReadyForMoreMediaData]){
                 NSLog(@"追加一个音频数据");
                 [self.audioInput appendSampleBuffer:sampleBuffer];
             }

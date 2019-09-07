@@ -29,13 +29,48 @@
     return finalBuffer;
 }
 
+- (CVPixelBufferRef)buffertoSize:(CGSize)size
+{
+    if(CGSizeEqualToSize(size, self.size) ||
+       size.width >= self.size.width ||
+       size.height >= self.size.height ||
+       CGSizeEqualToSize(size, CGSizeZero))
+    {
+//        return self.buffer;
+        size = self.size;
+    }
+    CGRect cropRect = CGRectMake((self.size.width - size.width)/2.0f, (self.size.height - size.height) /2.0f, size.width, size.height);
+    CVPixelBufferRef pixelBuffer = NULL;
+    NSDictionary * attrs = [NSDictionary dictionaryWithObjectsAndKeys:
+                            [NSNumber numberWithBool:YES], kCVPixelBufferCGImageCompatibilityKey,
+                            [NSNumber numberWithBool:YES], kCVPixelBufferCGBitmapContextCompatibilityKey,
+                            nil];
+    CVReturn status = CVPixelBufferCreate(kCFAllocatorDefault, size.width, size.height, kCVPixelFormatType_32BGRA,(__bridge CFDictionaryRef)attrs, &pixelBuffer);
+    if(status == kCVReturnSuccess)
+    {
+        CVPixelBufferLockBaseAddress(pixelBuffer, kCVPixelBufferLock_ReadOnly);
+        
+        void * data = CVPixelBufferGetBaseAddress(pixelBuffer);
+        
+        CGContextRef context = CGBitmapContextCreate(data, size.width, size.height, 8, CVPixelBufferGetBytesPerRow(pixelBuffer), CGColorSpaceCreateDeviceRGB(),  kCGBitmapByteOrder32Little | kCGImageAlphaPremultipliedFirst);
+        
+        CGImageRef imageRef = CGImageCreateWithImageInRect(self.CGImage, cropRect);
+        CGContextDrawImage(context, CGRectMake(0, 0, size.width, size.height), imageRef);
+        
+        CVPixelBufferUnlockBaseAddress(pixelBuffer, kCVPixelBufferLock_ReadOnly);
+        
+        CGContextRelease(context);
+        CGImageRelease(imageRef);
+    }
+    return pixelBuffer;
+}
+
 - (CVPixelBufferRef)buffer
 {
     NSDictionary * attrs = [NSDictionary dictionaryWithObjectsAndKeys:
                             [NSNumber numberWithBool:YES], kCVPixelBufferCGImageCompatibilityKey,
                             [NSNumber numberWithBool:YES], kCVPixelBufferCGBitmapContextCompatibilityKey,
                             nil];
-
     CVPixelBufferRef pixelBuffer;
     CVReturn status = CVPixelBufferCreate(kCFAllocatorDefault, self.size.width, self.size.height, kCVPixelFormatType_32BGRA,(__bridge CFDictionaryRef)attrs, &pixelBuffer);
     if(status == kCVReturnSuccess)
@@ -55,4 +90,26 @@
     }
     return nil;
 }
+
+//+ (CGRect)adapterSize:(CGSize) size toSize:(CGSize)aSize
+//{
+//    double w = size.width;
+//    double h = size.height;
+//    double hRatio = w / aSize.width;
+//    double vRation = h / aSize.height;
+//    double ration = MAX(vRation, hRatio);
+//    w /=ration;
+//    h /= ration;
+//    return CGRectMake((aSize.width - w)/2.0, (aSize.height - h )/2.0f, w, h);
+//}
+//+ (CGRect)cropSize:(CGSize)size toSize:(CGSize)aSize
+//{
+//    CGFloat w = aSize.width;
+//    CGFloat h = aSize.height;
+//    double hRation = w / size.width;
+//    double vRation = h / size.height;
+//    double ration = MIN(hRation, vRation);
+//
+//    return CGRectMake(0, 0, aSize.width, aSize.height);
+//}
 @end

@@ -47,7 +47,6 @@
         {
             ARSCNView * scnView = (ARSCNView *)self.view;
             CVPixelBufferRef rawBuffer = [scnView.session.currentFrame capturedImage];
-
             return rawBuffer;
         } else if ([self.view isKindOfClass:[ARSKView class]])
         {
@@ -60,7 +59,26 @@
     }
     return NULL;
 }
-- (CGSize)bufferSize{
+- (CGSize)bufferSizeFill
+{
+    CVPixelBufferRef raw = self.rawBuffer;
+    if(raw)
+    {
+        size_t width = CVPixelBufferGetWidth(raw);
+        size_t height = CVPixelBufferGetHeight(raw);
+        if(width > height)
+        {
+            return CGSizeMake(height, width);
+        }
+        else
+        {
+            return CGSizeMake(width, height);
+        }
+    }
+    return CGSizeZero;
+}
+- (CGSize)bufferSize
+{
     CVPixelBufferRef raw = self.rawBuffer;
     if(raw){
         size_t width = CVPixelBufferGetWidth(raw);
@@ -110,7 +128,7 @@
                 if(!renderFrame){
                     renderFrame = [self.renderEngine snapshotAtTime:self.time withSize:size antialiasingMode:SCNAntialiasingModeNone];
                 }
-                CVPixelBufferRef buffer = [renderFrame buffer];
+                CVPixelBufferRef buffer = [renderFrame buffertoSize:self.outputSize];
                 return buffer;
             }
         } else if ([self.view isKindOfClass:[ARSKView class]]) {
@@ -122,7 +140,7 @@
             if(renderFrame == nil) {
                 renderFrame = [[self.renderEngine snapshotAtTime:self.time withSize:size antialiasingMode:SCNAntialiasingModeNone] rotateByDegress:180.0f flip:NO];
             }
-            CVPixelBufferRef buffer = [renderFrame buffer];
+            CVPixelBufferRef buffer = [renderFrame buffertoSize:self.outputSize];
             return buffer;
             
         } else if ([self.view isKindOfClass:[SCNView class]]) {
@@ -134,7 +152,7 @@
             if(renderFrame == nil){
                  renderFrame = [self.renderEngine snapshotAtTime:self.time withSize:size antialiasingMode:SCNAntialiasingModeNone];
             }
-            CVPixelBufferRef buffer = [renderFrame buffer];
+            CVPixelBufferRef buffer = [renderFrame buffertoSize:self.outputSize];
             return buffer;
         }
     }

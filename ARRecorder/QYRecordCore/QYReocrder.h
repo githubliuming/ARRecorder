@@ -19,8 +19,6 @@ API_AVAILABLE(ios(11.0))
 
 - (instancetype)initWithARSKView:(ARSCNView *)arView;
 
-@property(nonatomic,strong)ARSCNView * weakScnView;
-
 @property(nonatomic,weak)id<RecordARDelegate> delegate;
 @property(nonatomic,weak)id<RenderARDelegate> renderARDelegate;
 
@@ -31,38 +29,36 @@ API_AVAILABLE(ios(11.0))
 
 @property(nonatomic,assign)ARVideoOrientation videoOrientation;
 @property(nonatomic,assign)ARFrameMode contentMode;
-@property(nonatomic,assign)ARFrameMode ARcontentMode;
-@property(nonatomic,assign)BOOL onlyRenderWhileRecording;
 @property(nonatomic,assign)BOOL enableAudio;
 @property(nonatomic,assign)BOOL enableMixWithOthers;
 @property(nonatomic,assign)BOOL adjustVideoForSharing;
-@property(nonatomic,assign)BOOL adjustGIFForSharing;
-@property(nonatomic,assign)BOOL deleteCacheWhenExported;
-@property(nonatomic,assign)BOOL enableAdjustEnvironmentLighting;
 
-@property(nonatomic,strong)dispatch_queue_t writerQueue;
-@property(nonatomic,strong)dispatch_queue_t audioSessionQueue;
+@property(nonatomic,assign)BOOL enableAdjustEnvironmentLighting;
 
 @property(nonatomic,assign)BOOL isRecording;
 @property(nonatomic,assign)BOOL adjustPausedTime;
-@property(nonatomic,assign)BOOL backFromPause;
-@property(nonatomic,assign)BOOL recordingWithLimit;
-@property(nonatomic,assign)BOOL onlyRenderWhileRec;
-@property(nonatomic,assign)CMTime pausedFrameTime;
-@property(nonatomic,assign)CMTime resumeFrameTime;
+
 @property(nonatomic,strong)NSURL * currentVideoPath;
 @property(nonatomic,strong)NSURL * currentAudioPath;
-@property(nonatomic,strong)NSURL * videoPath;
-@property(nonatomic,strong,nullable)WriteAR * wirtter;
 
+@property(nonatomic,assign)CGSize outputSize; //输出视频的尺寸,不设置会安原始帧的尺寸大小设置
+
+
+/// 开始 或者 恢复录制视频
 - (void)startRecord;
 
+/// 开始录制指定时长的视频
+/// @param time 录制时长
+/// @param finished 录制完成回调
 - (void)startRecord:(NSTimeInterval)time finished:(void(^)(NSURL * vidoePath))finished;
-
+/// 暂停录制
 - (void)pause;
 
+/// 结束录制视频
+/// @param finished 录制完成回调
 - (void)stop:(void(^)(NSURL * vidoePath))finished;
 
+/// 取消录制
 - (void)cancel;
 @end
 

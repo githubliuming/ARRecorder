@@ -14,6 +14,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (UIImage *)rotateByDegress:(CGFloat)degress flip:(BOOL)flip;
 
 - (CVPixelBufferRef)buffer;
+- (CVPixelBufferRef)buffertoSize:(CGSize)size;
 @end
 
 NS_ASSUME_NONNULL_END

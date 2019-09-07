@@ -9,9 +9,22 @@
 #import "QYReocrder.h"
 #import "Rendering/QYARRender.h"
 @interface QYReocrder()
+@property(nonatomic,weak)ARSCNView * weakScnView;
 @property(nonatomic,strong)CADisplayLink * displayLink;
 @property(nonatomic,strong)SCNRenderer * renderEngine;
 @property(nonatomic,strong)QYARRender * render;
+
+@property(nonatomic,strong)dispatch_queue_t writerQueue;
+@property(nonatomic,strong)dispatch_queue_t audioSessionQueue;
+@property(nonatomic,strong)NSURL * videoPath;
+@property(nonatomic,assign)ARFrameMode ARcontentMode;
+@property(nonatomic,assign)BOOL onlyRenderWhileRecording;
+@property(nonatomic,assign)BOOL backFromPause;
+@property(nonatomic,strong,nullable)WriteAR * wirtter;
+@property(nonatomic,assign)BOOL recordingWithLimit;
+@property(nonatomic,assign)BOOL onlyRenderWhileRec;
+@property(nonatomic,assign)CMTime pausedFrameTime;
+@property(nonatomic,assign)CMTime resumeFrameTime;
 @end
 @implementation QYReocrder
 - (instancetype)initWithARSKView:(ARSCNView *)arView
@@ -66,7 +79,6 @@
     {
         [WriteAR message:@"bufferSize is zero"];
         CVPixelBufferRelease(buffer);
-//        CVPixelBufferRelease(rawBuffer);
         return;
     }
     
@@ -118,8 +130,13 @@
             else
             {
                 self.currentVideoPath = self.videoPath;
+                CGSize vidoeSize = size;
+                if(!CGSizeEqualToSize(self.outputSize, CGSizeZero))
+                {
+                    vidoeSize = self.outputSize;
+                }
                 self.wirtter = [[WriteAR alloc] initWithOutput:self.currentVideoPath
-                                                          size:size
+                                                          size:vidoeSize
                                               adjustForSharing:self.adjustVideoForSharing
                                                   audioEnabled:self.enableAudio
                                                    orientaions:@[]
@@ -147,9 +164,7 @@
             self.status = paused;
             self.onlyRenderWhileRec = self.onlyRenderWhileRecording;
         }
-
         CVPixelBufferRelease(buffer);
-//        CVPixelBufferRelease(rawBuffer);
     });
     
 }
@@ -158,13 +173,12 @@
     self.status = unkown;
     self.micStatus = unknown;
     self.enableAudio = YES;
-    self.fps = autofps;
+    self.fps = fps30;
     self.videoOrientation = autoOrientation;
     self.contentMode = autoAdjust;
     self.onlyRenderWhileRecording = YES;
     self.enableMixWithOthers = YES;
     self.adjustVideoForSharing = YES;
-    self.deleteCacheWhenExported = YES;
     self.writerQueue = dispatch_queue_create("com.qyARRecord.writeQueue", DISPATCH_QUEUE_SERIAL);
 //    self.gifWriterQueue = dispatch_queue_create("com.qyARRecord.writeQueue", DISPATCH_QUEUE_SERIAL);
     self.audioSessionQueue = dispatch_queue_create("com.qyARRecord.audioSessionQueue", DISPATCH_QUEUE_CONCURRENT);
@@ -199,6 +213,11 @@
 
 - (void)startRecord
 {
+    if(self.isRecording)
+    {
+        NSLog(@"正在录制中...");
+        return;
+    }
     dispatch_sync(self.writerQueue, ^{
        
         if(self.enableAudio && self.micStatus == unknown)
@@ -348,6 +367,11 @@
         }break;
         case manual:{}break;
     }
+}
+- (void)setOutputSize:(CGSize)outputSize
+{
+    _outputSize = outputSize;
+    self.render.outputSize = _outputSize;
 }
 - (void)setOnlyRenderWhileRecording:(BOOL)onlyRenderWhileRecording
 {

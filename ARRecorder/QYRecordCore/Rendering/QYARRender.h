@@ -19,8 +19,11 @@ API_AVAILABLE(ios(11.0))
 @property(nonatomic,assign,readonly)CFTimeInterval time;
 @property(nonatomic,assign,readonly)CVPixelBufferRef rawBuffer;
 @property(nonatomic,assign,readonly)CGSize bufferSize;
+@property(nonatomic,assign,readonly)CGSize bufferSizeFill;
 @property(nonatomic,assign,readonly,nullable)CVPixelBufferRef buffer;
 @property(nonatomic,assign)ARFrameMode content;
+
+@property(nonatomic,assign)CGSize outputSize;
 @end
 
 NS_ASSUME_NONNULL_END
