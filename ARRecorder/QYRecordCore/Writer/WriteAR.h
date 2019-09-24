@@ -10,9 +10,11 @@
 #import "QYRecordConstant.h"
 #import<CoreMedia/CoreMedia.h>
 #import "RecordARDelegate.h"
+#import "AudioFilterProtocol.h"
 NS_ASSUME_NONNULL_BEGIN
 
-@interface WriteAR : NSObject
+@interface WriteAR : NSObject<AudioFilterInputEnabled>
+
 @property(nonatomic,weak)id<RecordARDelegate> delegate;
 
 @property(nonatomic,assign)ARVideoOrientation videoInputOrientation;

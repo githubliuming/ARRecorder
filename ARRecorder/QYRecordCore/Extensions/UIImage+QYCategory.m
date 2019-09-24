@@ -39,7 +39,8 @@
 //        return self.buffer;
         size = self.size;
     }
-    CGRect cropRect = CGRectMake((self.size.width - size.width)/2.0f, (self.size.height - size.height) /2.0f, size.width, size.height);
+    CGRect cropRect = [self cropSize:self.size toSize:size];
+    NSLog(@"裁剪 rect = %@ originSize = %@",NSStringFromCGRect(cropRect),NSStringFromCGSize(self.size));
     CVPixelBufferRef pixelBuffer = NULL;
     NSDictionary * attrs = [NSDictionary dictionaryWithObjectsAndKeys:
                             [NSNumber numberWithBool:YES], kCVPixelBufferCGImageCompatibilityKey,
@@ -52,7 +53,13 @@
         
         void * data = CVPixelBufferGetBaseAddress(pixelBuffer);
         
-        CGContextRef context = CGBitmapContextCreate(data, size.width, size.height, 8, CVPixelBufferGetBytesPerRow(pixelBuffer), CGColorSpaceCreateDeviceRGB(),  kCGBitmapByteOrder32Little | kCGImageAlphaPremultipliedFirst);
+        CGContextRef context = CGBitmapContextCreate(data,
+                                                     size.width,
+                                                     size.height,
+                                                     8,
+                                                     CVPixelBufferGetBytesPerRow(pixelBuffer),
+                                                     CGColorSpaceCreateDeviceRGB(),
+                                                     kCGBitmapByteOrder32Little | kCGImageAlphaPremultipliedFirst);
         
         CGImageRef imageRef = CGImageCreateWithImageInRect(self.CGImage, cropRect);
         CGContextDrawImage(context, CGRectMake(0, 0, size.width, size.height), imageRef);
@@ -90,26 +97,15 @@
     }
     return nil;
 }
-
-//+ (CGRect)adapterSize:(CGSize) size toSize:(CGSize)aSize
-//{
-//    double w = size.width;
-//    double h = size.height;
-//    double hRatio = w / aSize.width;
-//    double vRation = h / aSize.height;
-//    double ration = MAX(vRation, hRatio);
-//    w /=ration;
-//    h /= ration;
-//    return CGRectMake((aSize.width - w)/2.0, (aSize.height - h )/2.0f, w, h);
-//}
-//+ (CGRect)cropSize:(CGSize)size toSize:(CGSize)aSize
-//{
-//    CGFloat w = aSize.width;
-//    CGFloat h = aSize.height;
-//    double hRation = w / size.width;
-//    double vRation = h / size.height;
-//    double ration = MIN(hRation, vRation);
-//
-//    return CGRectMake(0, 0, aSize.width, aSize.height);
-//}
+- (CGRect)cropSize:(CGSize)size toSize:(CGSize)aSize
+{
+    size_t w = aSize.width;
+    size_t h = aSize.height;
+    double hRation = w / size.width;
+    double vRation = h / size.height;
+    double ration = MAX(hRation, vRation);
+    w /= ration;
+    h /= ration;
+    return CGRectMake(((size_t)size.width - (size_t)w)/2.0, ((size_t)size.height - (size_t)h)/2.0f, w,h);
+}
 @end

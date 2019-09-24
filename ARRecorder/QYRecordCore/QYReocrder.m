@@ -8,11 +8,14 @@
 
 #import "QYReocrder.h"
 #import "Rendering/QYARRender.h"
+#import "QYAudioCollector.h"
+#import "QYVoiceChangeFilter.h"
 @interface QYReocrder()
 @property(nonatomic,weak)ARSCNView * weakScnView;
 @property(nonatomic,strong)CADisplayLink * displayLink;
 @property(nonatomic,strong)SCNRenderer * renderEngine;
 @property(nonatomic,strong)QYARRender * render;
+@property(nonatomic,strong)QYAudioCollector * audioCollector;
 
 @property(nonatomic,strong)dispatch_queue_t writerQueue;
 @property(nonatomic,strong)dispatch_queue_t audioSessionQueue;
@@ -35,6 +38,8 @@
         _weakScnView  = arView;
         [self initParams];
         [self initEnvironment];
+        float scale = 1.0f;
+        self.outputSize = CGSizeMake(_weakScnView.bounds.size.width * scale, _weakScnView.bounds.size.height * scale);
     }
     return self;
 }
@@ -135,6 +140,7 @@
                 {
                     vidoeSize = self.outputSize;
                 }
+                
                 self.wirtter = [[WriteAR alloc] initWithOutput:self.currentVideoPath
                                                           size:vidoeSize
                                               adjustForSharing:self.adjustVideoForSharing
@@ -145,10 +151,21 @@
                                                            fps:self.fps];
                 self.wirtter.videoInputOrientation = self.videoOrientation;
                 self.wirtter.delegate = self.delegate;
+
+                
+                self.audioCollector = [[QYAudioCollector alloc] initWithAudioEnabled:self.enableAudio
+                                                                               queue:self.writerQueue];
+//                QYVoiceChangeFilter * filter = [[QYVoiceChangeFilter alloc] init];
+//                [self.audioCollector addTarget:filter];
+//                [filter addTarget:self.wirtter];
+//
+                [self.audioCollector addTarget:self.wirtter];
+                
             }
         } else if(!self.isRecording && self.adjustPausedTime)
         {
             [self.wirtter pause];
+            [self.audioCollector pause];
             self.adjustPausedTime = NO;
             if(CMTimeCompare(self.pausedFrameTime, kCMTimeZero) != 0 && CMTimeCompare(self.resumeFrameTime, kCMTimeZero) != 0)
             {
@@ -230,12 +247,14 @@
                }
                 self.isRecording = YES;
                 self.status = recording;
+                [self.audioCollector startRecord];
             }];
         }
         else
         {
             self.isRecording = YES;
             self.status = recording;
+            [self.audioCollector startRecord];
         }
     });
 }
@@ -305,6 +324,7 @@
         self.resumeFrameTime = kCMTimeZero;
         dispatch_async(dispatch_get_main_queue(), ^{
            
+            [self.audioCollector end];
             [self.wirtter end:^{
                 NSLog(@"视频录制结束");
                 if(self.currentVideoPath){
@@ -316,6 +336,8 @@
                         [self.delegate didEndRecording:self.currentVideoPath noError:YES];
                     }
                 }
+                [self.audioCollector removeAllTargets];
+                self.audioCollector = nil;
                 self.wirtter = nil;
             }];
         });
@@ -333,6 +355,7 @@
         self.resumeFrameTime = kCMTimeZero;
         
         dispatch_async(dispatch_get_main_queue(), ^{
+            [self.audioCollector cancel];
             [self.wirtter cancel];
             if(self.currentVideoPath)
             {
@@ -351,6 +374,8 @@
                     [self.delegate didCancelReocording:@"异常取消录制视频"];
                 }
             }
+            [self.audioCollector removeAllTargets];
+            self.audioCollector = nil;
             self.wirtter = nil;
         });
         

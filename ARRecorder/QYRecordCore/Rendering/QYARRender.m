@@ -80,46 +80,50 @@
 - (CGSize)bufferSize
 {
     CVPixelBufferRef raw = self.rawBuffer;
-    if(raw){
+//    if(raw){
         size_t width = CVPixelBufferGetWidth(raw);
         size_t height = CVPixelBufferGetHeight(raw);
-        switch(self.content)
-        {
-            case autoAdjust:{
-                if([[UIScreen mainScreen] qy_isPhone10])
-                {
-                    width = [UIScreen mainScreen].nativeBounds.size.width;
-                    height = [UIScreen mainScreen].nativeBounds.size.height;
-                }
-            }break;
-            case aspectFit:{
-                width = CVPixelBufferGetWidth(raw);
-                height = CVPixelBufferGetHeight(raw);
-            }break;
-            case aspectFill:{
-                width = [UIScreen mainScreen].nativeBounds.size.width;
-                height = [UIScreen mainScreen].nativeBounds.size.height;
-            }break;
-            default:{
-                if([[UIScreen mainScreen] qy_isPhone10])
-                {
-                    width = [UIScreen mainScreen].nativeBounds.size.width;
-                    height = [UIScreen mainScreen].nativeBounds.size.height;
-                }
-            }break;
-        }
+//        switch(self.content)
+//        {
+//            case autoAdjust:{
+//                if([[UIScreen mainScreen] qy_isPhone10])
+//                {
+//                    width = [UIScreen mainScreen].nativeBounds.size.width;
+//                    height = [UIScreen mainScreen].nativeBounds.size.height;
+//                }
+//            }break;
+//            case aspectFit:{
+//                width = CVPixelBufferGetWidth(raw);
+//                height = CVPixelBufferGetHeight(raw);
+//            }break;
+//            case aspectFill:{
+//                width = [UIScreen mainScreen].nativeBounds.size.width;
+//                height = [UIScreen mainScreen].nativeBounds.size.height;
+//            }break;
+//            default:{
+//                if([[UIScreen mainScreen] qy_isPhone10])
+//                {
+//                    width = [UIScreen mainScreen].nativeBounds.size.width;
+//                    height = [UIScreen mainScreen].nativeBounds.size.height;
+//                }
+//            }break;
+//        }
         if(width > height){
             return CGSizeMake(height, width);
         } else {
             return CGSizeMake(width, height);
         }
-    }
-    return CGSizeZero;
+//    }
+//    return CGSizeZero;
 }
 - (CVPixelBufferRef)buffer{
     if(self.view){
+        CGSize size = self.bufferSize;
+        if(!CGSizeEqualToSize(self.outputSize, CGSizeZero))
+        {
+            size = CGSizeMake(self.outputSize.width * 2, self.outputSize.height * 2);
+        }
         if([self.view isKindOfClass:[ARSCNView class]]){
-            CGSize size = self.bufferSize;
             if(!CGSizeEqualToSize(size, CGSizeZero)){
                 __block UIImage * renderFrame;
                 dispatch_sync(self.pixelsQueue, ^{
@@ -132,7 +136,6 @@
                 return buffer;
             }
         } else if ([self.view isKindOfClass:[ARSKView class]]) {
-            CGSize size = self.bufferSize;
              __block UIImage * renderFrame;
             dispatch_sync(self.pixelsQueue, ^{
                 renderFrame = [[self.renderEngine snapshotAtTime:self.time withSize:size antialiasingMode:SCNAntialiasingModeNone] rotateByDegress:180.0f flip:NO];
@@ -144,7 +147,6 @@
             return buffer;
             
         } else if ([self.view isKindOfClass:[SCNView class]]) {
-            CGSize size = [[UIScreen mainScreen] bounds].size;
            __block UIImage * renderFrame;
             dispatch_sync(self.pixelsQueue, ^{
                 renderFrame = [self.renderEngine snapshotAtTime:self.time withSize:size antialiasingMode:SCNAntialiasingModeNone];
